@@ -19,10 +19,10 @@ export function checkTime() {
 
   if(currentTime == '9:0') { // 09:00
     Bot.users.send(process.env.USERID,
-    'Good morning ');
+    'Good morning.');
     }
   if(marketDays.includes(currentDay)) {
     Bot.users.send(process.env.USERID,
-    'Remember, do not panic buy any options. It will be hard, but try your best.');
+    'Remember, do not panic-buy any options. It will be hard, but try your best.');
   }
 }
