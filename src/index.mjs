@@ -1,8 +1,11 @@
+// Imports I need
 import { Client, GatewayIntentBits } from 'discord.js';
-import PresenceData from 'discord.js';
-import { checkTime } from './functions/morning-message.mjs';
 import { config } from 'dotenv';
 config();
+
+// Bot command improts
+import { remindMe } from './functions/remindMe.mjs';
+
 
 
 // Bot startup. <!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!>
@@ -20,7 +23,7 @@ Bot.once('ready', (c) => { // c is an instance of the bot (client)
   console.log(`${c.user.username} ready to go.`);
   
   Bot.user.setPresence({
-    activities: [{ name: '2048',}],
+    activities: [{ name: 'the market',}],
     status: 'online',
   });
 })
@@ -32,9 +35,16 @@ Bot.login(process.env.TOKEN); // Takes the bot token. DO NOT SHARE IT!
 // Functions I care about. <!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!>
 
 
-//Checks time so bot sends a good morning message to a user and tells them to not panic buy any options.
-setInterval(checkTime, 60000);
 
+// Bot sends an inputted message to the user.
+Bot.on('interactionCreate', async (interaction) => {
+  if(!interaction.isChatInputCommand) { return; }
+  if(interaction.commandName == 'remindme') {
+
+    const userTime = (await remindMe(interaction)).userTime;
+    interaction.reply(`> ✅  Reminder set for ${userTime}!`)
+  }
+});
 
 
 // Export for other functions.
