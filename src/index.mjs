@@ -5,6 +5,7 @@ config();
 
 // Bot command improts
 import { remindMe } from './functions/remindMe.mjs';
+import { saveImage } from './functions/saveImage.mjs';
 
 
 
@@ -45,6 +46,17 @@ Bot.on('interactionCreate', async (interaction) => {
     interaction.reply(`> ✅  Reminder set for ${userTime}!`)
   }
 });
+
+// Bot sends image to user (saving it in a sense)
+Bot.on('interactionCreate', async (interaction) => {
+  if(!interaction.isChatInputCommand) { return; }
+  if(interaction.commandName == 'saveimage') {
+    let userMessage = await saveImage(interaction);
+    console.log(userMessage);
+    interaction.reply(userMessage);
+
+  }
+})
 
 
 // Export for other functions.

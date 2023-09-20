@@ -4,10 +4,12 @@ config();
 
 // Import commands here please.
 import { remindMeCommandJSON } from "./remind-me-command.mjs";
+import { saveImageCommandJSON } from "./save-image-command.mjs";
 
 const rest = new REST({ version: '10'}).setToken(process.env.TOKEN); // Rest makes a request to Discord API using the bot.
 const commands = [
   JSON.parse(remindMeCommandJSON),
+  JSON.parse(saveImageCommandJSON)
 ];
 
 (async () => { // Async because you're dealing with HTTP requests; You have to wait for them.

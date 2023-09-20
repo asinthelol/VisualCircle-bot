@@ -21,15 +21,15 @@ export async function remindMe(interaction) {
   const delay = ((uTimeInMinutes - timeInMinutes) < 0) ? (uTimeInMinutes - timeInMinutes) * 60  + oneDay : (uTimeInMinutes - timeInMinutes) * 60; // the delay was always 1/60th of what it needed to be...
     
   setTimeout(async () => {
-      try {
-        await Bot.users.send(
-          interaction.user.id,
-          `:dart:  Reminder for ${userTime} :dart:\n>>> ` + userMessage
-          );
-      } catch(err) {
-        console.log('found an error')
-      }
-    }, delay);
+    try {
+      await Bot.users.send(
+        interaction.user.id,
+        `:dart:  Reminder for ${userTime} :dart:\n>>> ` + userMessage
+      );
+    } catch(err) {
+      console.log('found an error')
+    }
+  }, delay);
 
     return { userTime };
 
