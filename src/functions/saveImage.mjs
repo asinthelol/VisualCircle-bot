@@ -6,14 +6,7 @@ config();
 
 export async function saveImage(interaction) {
 
-  const userMessage = interaction.options.attachment;
+  const userImage = await interaction.options.get('image').attachment.url;
     
-  async () => {
-    try {
-      console.log(userMessage)
-    } catch(err) {
-      console.log('found an error')
-    }
-  }
-  return userMessage;
+  return userImage;
 }

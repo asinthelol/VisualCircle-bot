@@ -51,9 +51,9 @@ Bot.on('interactionCreate', async (interaction) => {
 Bot.on('interactionCreate', async (interaction) => {
   if(!interaction.isChatInputCommand) { return; }
   if(interaction.commandName == 'saveimage') {
-    let userMessage = await saveImage(interaction);
-    console.log(userMessage);
-    interaction.reply(userMessage);
+    let userImage = await saveImage(interaction);
+    interaction.reply('Here is the image!');
+    interaction.channel.send(userImage);
 
   }
 })

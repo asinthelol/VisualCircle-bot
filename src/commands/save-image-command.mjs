@@ -1,23 +1,11 @@
-import { ApplicationCommandOptionType } from "discord.js";
+import {SlashCommandBuilder, ApplicationCommandOptionType } from "discord.js";
 
-const saveImageCommand = {
-  data: {
-    name: 'saveimage',
-    description: 'Saves whatever image the user attaches.',
-    options:
-      [{
-        name: 'image',
-        description: 'Attach your image.',
-        type: ApplicationCommandOptionType.Attachment,
-        required: true
-      }
-    ]
-  }
-};
-
-// Use JSON.stringify to convert to JSON
-export const saveImageCommandJSON = JSON.stringify({
-  name: saveImageCommand.data.name,
-  description: saveImageCommand.data.description,
-  options: saveImageCommand.data.options
-});
+export const saveImageCommand = new SlashCommandBuilder()
+  .setName('saveimage')
+  .setDescription('Saves whatever image the user attaches.')
+  .addAttachmentOption((option) => 
+    option
+      .setName('image')
+      .setDescription('Attach your image.')
+      .setRequired(true)
+  )
