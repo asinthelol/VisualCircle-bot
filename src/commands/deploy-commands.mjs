@@ -2,7 +2,7 @@ import { REST, Routes } from "discord.js";
 import { config } from "dotenv";
 config();
 
-// Import commands here please.
+// Imports commands
 import { remindMeCommand } from "./remind-me-command.mjs";
 import { saveImageCommand } from "./save-image-command.mjs";
 

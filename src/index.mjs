@@ -3,16 +3,13 @@ import { Client, GatewayIntentBits } from 'discord.js';
 import { config } from 'dotenv';
 config();
 
-// Bot command improts
+// Bot command imports
 import { remindMe } from './functions/remindMe.mjs';
 import { saveImage } from './functions/saveImage.mjs';
 
 
 
-// Bot startup. <!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!>
-
-
-
+// Bot startup.
 const Bot = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -20,7 +17,7 @@ const Bot = new Client({
     GatewayIntentBits.MessageContent]
 });
 
-Bot.once('ready', (c) => { // c is an instance of the bot (client)
+Bot.once('ready', (c) => { // c is an instance of the bot (client).
   console.log(`${c.user.username} ready to go.`);
   
   Bot.user.setPresence({
@@ -33,7 +30,7 @@ Bot.login(process.env.TOKEN); // Takes the bot token. DO NOT SHARE IT!
 
 
 
-// Functions I care about. <!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!>
+// Functions I care about.
 
 
 
@@ -47,13 +44,12 @@ Bot.on('interactionCreate', async (interaction) => {
   }
 });
 
-// Bot sends image to user (saving it in a sense)
+// Bot saves image that user sends to an image folder.
 Bot.on('interactionCreate', async (interaction) => {
   if(!interaction.isChatInputCommand) { return; }
   if(interaction.commandName == 'saveimage') {
-    let userImage = await saveImage(interaction);
-    interaction.reply('Here is the image!');
-    interaction.channel.send(userImage);
+    saveImage(interaction);
+    interaction.reply('Image saved! ✅');
 
   }
 })

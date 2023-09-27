@@ -1,5 +1,8 @@
 import { ApplicationCommandOptionType, SlashCommandBuilder } from "discord.js";
 
+
+
+// Look at the code, it tells you everything about the command
 export const remindMeCommand = new SlashCommandBuilder()
   .setName('remindme')
   .setDescription('reminds the user whatever they want, at whatever time')

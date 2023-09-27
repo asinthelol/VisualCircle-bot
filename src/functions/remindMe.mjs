@@ -12,7 +12,7 @@ export async function remindMe(interaction) {
   const currentHour = (Time.getHours()) * 60;
   const currentMinute = Time.getMinutes();
   const timeInMinutes = (currentHour + currentMinute) * 1000; // Converts the time to miliseconds.
-  const oneDay = 86400000; // 24hrs.
+  const oneDay = 86400000; // 24hrs in miliseconds.
 
   const userMessage = JSON.stringify(interaction.options.getString('message')).replace(/"/g, ''); 
   const userTime = JSON.stringify(interaction.options.getString('time')).replace(/"/g, ''); // Time user wants to recieve message.
@@ -31,6 +31,6 @@ export async function remindMe(interaction) {
     }
   }, delay);
 
-    return { userTime };
+    return { userTime }; // Sent to index.mjs so the user can see what time the reminder is set for (in the channel command was called).
 
 }
