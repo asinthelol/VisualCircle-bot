@@ -1,11 +1,14 @@
 // Imports I need
 import { Client, GatewayIntentBits } from 'discord.js';
 import { config } from 'dotenv';
+import { Sequelize } from 'sequelize';
+import fs from 'fs';
 config();
 
 // Bot command imports
 import { remindMe } from './functions/remindMe.mjs';
 import { saveImage } from './functions/saveImage.mjs';
+import { getImage } from './functions/getImage.mjs';
 
 
 
@@ -18,10 +21,11 @@ const Bot = new Client({
 });
 
 Bot.once('ready', (c) => { // c is an instance of the bot (client).
+  Images.sync();
   console.log(`${c.user.username} ready to go.`);
   
   Bot.user.setPresence({
-    activities: [{ name: 'the market',}],
+    activities: [{ name: 'the world',}],
     status: 'online',
   });
 })
@@ -54,6 +58,79 @@ Bot.on('interactionCreate', async (interaction) => {
   }
 })
 
+Bot.on('interactionCreate', async (interaction) => {
+  if (!interaction.isChatInputCommand) { return; }
+  if (interaction.commandName === 'getimage') { 
 
-// Export for other functions.
-export { Bot };
+    const imagePath = await getImage(interaction);
+
+    await interaction.deferReply()
+
+    if(imagePath) {
+      fs.readFile(imagePath, async (err, image) => {
+
+        if (err) {
+          console.error('Error reading file:', err);
+          await interaction.editReply('Sorry, I cannot retrieve the file!')
+        } else if (image) interaction.editReply({
+          files: [imagePath],
+          content: 'Here\'s the image!'
+        });
+        else {
+            console.log('Image not in fs.')
+            await interaction.editReply('Image is not in the file system!')
+          }
+      });
+    } else {
+      console.log('Image not in db.')
+      await interaction.editReply('image not found!')
+    }
+  }
+});
+
+
+
+
+// MySQL Stuff
+
+
+
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USERNAME, process.env.DB_PASSWORD, {
+	host: 'localhost',
+	dialect: process.env.DB_DIALECT,
+	logging: false,
+});
+
+const Images = sequelize.define('images', {
+    id: {
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+      unique: true,
+      autoIncrement: true,
+      allowNull: false
+    },
+    name: {
+      type: Sequelize.STRING,
+      allowNull: false
+    },
+    img_dir: {
+      type: Sequelize.STRING,
+      allowNull: false
+    },
+    artist_name: {
+      type: Sequelize.STRING,
+      allowNull: true
+    },
+    source: {
+      type: Sequelize.STRING,
+      allowNull: true
+    }
+  },
+  {
+    timestamps: false
+  }
+
+);
+
+
+export { Bot, Images };

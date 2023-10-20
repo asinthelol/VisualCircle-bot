@@ -1,11 +1,11 @@
-import { ApplicationCommandOptionType, SlashCommandBuilder } from "discord.js";
+import { SlashCommandBuilder } from "discord.js";
 
 
 
 // Look at the code, it tells you everything about the command
 export const remindMeCommand = new SlashCommandBuilder()
   .setName('remindme')
-  .setDescription('reminds the user whatever they want, at whatever time')
+  .setDescription('Reminds the user whatever they want, at whatever time.')
   .addStringOption((option) => 
     option
       .setName('message')
@@ -15,6 +15,6 @@ export const remindMeCommand = new SlashCommandBuilder()
   .addStringOption((option) => 
     option
     .setName('time')
-    .setDescription('Set the time you want to receive the message. Format time as 00:00')
+    .setDescription('Set the time you want to receive the message. Format time as 00:00.')
     .setRequired(true)
-  )
+  );
