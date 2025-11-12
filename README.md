@@ -13,6 +13,7 @@ Made using [discord.js](https://discord.js.org/)
 3. Download visualcircle-bot.zip from releases.
 4. replace TOKEN, GUILD_ID, and BOT_ID in .env with your bot's token, server ID, and bot ID.
 5. run npm i in terminal.
-6. run deploy-commands.mjs.
+6. run node .\src\commands\deploy-commands.mjs.
+7. run node .\src\index.mjs
 6. run nodemon and enjoy using the bot.
  
