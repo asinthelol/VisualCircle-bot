@@ -1,18 +1,21 @@
 import { config } from 'dotenv';
 import fetch from 'node-fetch';
+import fs from 'fs';
+import path from 'path';
 import { prisma } from '../lib/prisma';
-import { uploadToS3 } from '../lib/s3';
 config();
 
-// Gets the attached image and uploads it to S3
+
+// Folder location for saved images
+const imagesFolder = './src/user-content/images'
+
+// Gets the attached image and it's file name, adds to a file path, then writes the file.
 export async function saveImage(interaction) {
   const userImageUrl = await interaction.options.get('image').attachment.url;
   const userImageName = await interaction.options.get('name').value;
-  const imageAttachment = await interaction.options.get('image').attachment;
-  const imageName = imageAttachment.name;
-  const contentType = imageAttachment.contentType || 'image/png';
+  const ImageName = await interaction.options.get('image').attachment.name;
+  const filePath = path.join(imagesFolder, ImageName)
 
-  // Check if image name already exists
   const imageRecord = await prisma.image.findFirst({
     where: { name: userImageName },
   });
@@ -21,19 +24,20 @@ export async function saveImage(interaction) {
     throw new Error('Image name already exists.');
   }
 
-  // Download image from Discord
-  const response = await fetch(userImageUrl);
-  const imageBuffer = Buffer.from(await response.arrayBuffer());
+  fetch(userImageUrl)
+    .then((res) => res.arrayBuffer()) // Turns response (the image) into something the computer can actually read
+    .then((imageBuffer) => {
+      fs.writeFile(filePath, Buffer.from(imageBuffer), (err) => {
+        if(err) {
+          console.log(err)
+        }
+      })
+    });
 
-  // Upload to S3 with unique key
-  const s3Key = `images/${Date.now()}-${imageName}`;
-  const s3Url = await uploadToS3(s3Key, imageBuffer, contentType);
-
-  // Save metadata to database
   await prisma.image.create({
     data: {
       name: userImageName,
-      url: s3Url,
+      url: filePath,
       uploadedAt: new Date(),
     }
   });
