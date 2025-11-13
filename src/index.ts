@@ -76,12 +76,13 @@ Bot.on('interactionCreate', async (interaction: Interaction) => {
 
   const cmd = interaction as ChatInputCommandInteraction;
   if(cmd.commandName == 'saveimage') {
+    await cmd.deferReply();
     try {
       await saveImage(cmd);
-      cmd.reply('Image saved! :white_check_mark:');
+      await cmd.editReply('Image saved! :white_check_mark:');
     } catch (error) {
       console.error(error);
-      cmd.reply('Failed to save image. Image name may already exist.');
+      await cmd.editReply('Failed to save image. Image name may already exist.');
     }
   }
 });
@@ -92,12 +93,13 @@ Bot.on('interactionCreate', async (interaction: Interaction) => {
   const cmd = interaction as ChatInputCommandInteraction;
 
   if(cmd.commandName == 'retrieveimage') {
+    await cmd.deferReply();
     try {
       const imageBuffer = await retrieveImage(cmd.options.getString('name') as string);
       if (imageBuffer) {
-        cmd.reply({ content: 'Image Found!', files: [{ attachment: imageBuffer }] });
+        await cmd.editReply({ content: 'Image Found!', files: [{ attachment: imageBuffer }] });
       } else {
-        cmd.reply('Image not found.');
+        await cmd.editReply('Image not found.');
       }
     } catch (error) {
       console.error(error);
