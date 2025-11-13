@@ -1,19 +1,82 @@
-# VisualCircle Discord Bot
-A multipurpose discord bot.
+# VisualCircle Bot – Discord Image-Saving Bot
 
-Made using [discord.js](https://discord.js.org/)
+## Quick Start
 
-## How to add
-1. Create a new discord application and bot [here](https://discord.com/developers/applications)
-2. Add the bot to your discord server with the following scopes and permissions:
-> applications.commands,
-> bot,
-> Read Messages,
-> Send Messages,
-3. Download visualcircle-bot.zip from releases.
-4. replace TOKEN, GUILD_ID, and BOT_ID in .env with your bot's token, server ID, and bot ID.
-5. run npm i in terminal.
-6. run node .\src\commands\deploy-commands.mjs.
-7. run node .\src\index.mjs
-6. run nodemon and enjoy using the bot.
- 
+1. Clone the repo
+
+```bash
+git clone https://github.com/asinthelol/VisualCircle-bot.git
+cd VisualCircle-bot
+```
+
+2. Set up your environment
+
+Create a `.env` file with your Discord bot credentials and database connection:
+  - May need to change from sqlserver in `./prisma/schema.prisma`
+
+```env
+TOKEN=your_discord_bot_token
+BOT_ID=your_bot_id
+GUILD_ID=your_server_id
+DATABASE_URL=sqlserver://localhost:1433;database=VisualCircle;user=sa;password=YourPassword;trustServerCertificate=true;encrypt=true
+```
+
+3. Install dependencies
+
+```bash
+npm install
+```
+
+This will automatically generate the Prisma client.
+
+4. Set up the database
+
+```bash
+npx prisma db push
+```
+
+5. Deploy slash commands
+
+```bash
+npm run commands
+```
+
+6. Run the bot
+
+```bash
+npm run dev
+```
+
+## Features
+
+- Slash command support
+- Image saving and retrieval
+- Reminder system
+- SQL Server database integration
+- TypeScript with hot reload
+
+## Docker Deployment
+
+Build the image:
+
+```bash
+docker build -t visualcircle-bot .
+```
+
+Run with environment variables:
+
+```bash
+docker run -d --env-file .env --name visualcircle-bot visualcircle-bot:latest
+```
+
+## Built With
+
+- Discord.js v14
+- TypeScript
+- Prisma (SQL Server)
+- Node.js
+- Docker
+
+## License
+
+I don't care what you do with it, just don't say you made this.

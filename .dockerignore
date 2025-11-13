@@ -2,5 +2,4 @@ node_modules
 .vscode
 .git
 .env
-package-lock.json
 Dockerfile

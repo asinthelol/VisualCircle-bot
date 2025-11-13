@@ -17,4 +17,4 @@ export const remindMeCommand = new SlashCommandBuilder()
     .setName('time')
     .setDescription('Set the time you want to receive the message. Format time as 00:00')
     .setRequired(true)
-  ).toJSON();
+  );

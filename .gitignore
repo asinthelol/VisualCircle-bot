@@ -1,3 +1,11 @@
 .env
 node_modules
 .vscode
+/src/user-content/images/*.png
+/src/user-content/images/*.jpg
+/src/user-content/images/*.jpeg
+/src/user-content/images/*.gif
+/src/user-content/images/*.webp
+/src/generated/
+dist/
+*.log

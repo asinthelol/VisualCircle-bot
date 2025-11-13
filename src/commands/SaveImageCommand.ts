@@ -1,4 +1,4 @@
-import {SlashCommandBuilder, ApplicationCommandOptionType } from "discord.js";
+import {SlashCommandBuilder } from "discord.js";
 
 
 
@@ -11,4 +11,10 @@ export const saveImageCommand = new SlashCommandBuilder()
       .setName('image')
       .setDescription('Attach your image.')
       .setRequired(true)
-  ).toJSON();
+  )
+  .addStringOption((option) => 
+    option
+      .setName('name')
+      .setDescription('Set the name of the image you want to save.')
+      .setRequired(true)
+  );

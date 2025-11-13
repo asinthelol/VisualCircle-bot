@@ -1,11 +1,13 @@
 // Imports I need
 import { Client, GatewayIntentBits, ChatInputCommandInteraction, Interaction } from 'discord.js';
 import { config } from 'dotenv';
+import { prisma } from './lib/prisma';
 config();
 
 // Bot command imports
 import { remindMe } from './functions/remindMe';
 import { saveImage } from './functions/saveImage';
+import { retrieveImage } from './functions/retrieveImage';
 
 
 
@@ -17,7 +19,7 @@ const Bot = new Client({
     GatewayIntentBits.MessageContent]
 });
 
-Bot.once('ready', (client: Client) => {
+Bot.once('clientReady', (client: Client) => {
   if (!client.user) {
     console.error('Client user is undefined on ready event.');
     return;
@@ -64,7 +66,7 @@ Bot.on('interactionCreate', async (interaction: Interaction) => {
   if(cmd.commandName == 'remindme') {
 
     const userTime = (await remindMe(cmd)).time;
-    cmd.reply(`> ✅  Reminder set for ${userTime}!`)
+    cmd.reply(`> :white_check_mark:  Reminder set for ${userTime}!`)
   }
 });
 
@@ -74,11 +76,60 @@ Bot.on('interactionCreate', async (interaction: Interaction) => {
 
   const cmd = interaction as ChatInputCommandInteraction;
   if(cmd.commandName == 'saveimage') {
-    saveImage(cmd);
-    cmd.reply('Image saved! ✅');
-
+    try {
+      await saveImage(cmd);
+      cmd.reply('Image saved! :white_check_mark:');
+    } catch (error) {
+      console.error(error);
+      cmd.reply('Failed to save image. Image name may already exist.');
+    }
   }
-})
+});
+
+Bot.on('interactionCreate', async (interaction: Interaction) => {
+  if(!interaction.isChatInputCommand) { return; }
+
+  const cmd = interaction as ChatInputCommandInteraction;
+
+  if(cmd.commandName == 'retrieveimage') {
+    try {
+      const imageBuffer = await retrieveImage(cmd.options.getString('name') as string);
+      if (imageBuffer) {
+        cmd.reply({ content: 'Image Found!', files: [{ attachment: imageBuffer }] });
+      } else {
+        cmd.reply('Image not found.');
+      }
+    } catch (error) {
+      console.error(error);
+      cmd.reply('An error occurred while retrieving the image.');
+    }
+  }
+});
+// Handle Ctrl+C (SIGINT) and graceful termination (SIGTERM)
+process.on('SIGINT', async () => {
+  console.log('SIGINT received: disconnecting Prisma and shutting down.');
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  console.log('SIGTERM received: disconnecting Prisma and shutting down.');
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+// Handle unhandled rejections / uncaught exceptions
+process.on('unhandledRejection', async (reason) => {
+  console.error('Unhandled Rejection:', reason);
+  try { await prisma.$disconnect(); } catch {}
+  process.exit(1);
+});
+
+process.on('uncaughtException', async (err) => {
+  console.error('Uncaught Exception:', err);
+  try { await prisma.$disconnect(); } catch {}
+  process.exit(1);
+});
 
 
 // Export for other functions.

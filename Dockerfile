@@ -1,21 +1,48 @@
-# Instructions to build the Docker image
+# Stage 1: Build TypeScript
+FROM node:22 AS builder
 
-# Using Node.js version 22
-FROM node:22
-
-# Create app directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json to the working directory
+# Copy package files
 COPY package*.json ./
-RUN npm install --production
+COPY tsconfig.json ./
+COPY prisma ./prisma/
 
-# B) Copy application source
-COPY . .
+# Install ALL dependencies (including devDependencies for build)
+RUN npm ci
 
-# Ensure the user-content/images directory exists (used by saveImage)
-RUN mkdir -p ./src/user-content/images
+# Copy source code
+COPY src ./src
+
+# Build TypeScript and generate Prisma Client
+RUN npm run build
+
+# Stage 2: Production runtime
+FROM node:22
+
+WORKDIR /app
+
+# Copy package files
+COPY --from=builder /app/package*.json ./
+COPY prisma ./prisma/
+
+# Install production dependencies only
+RUN npm ci --omit=dev
+
+# Copy generated Prisma Client from builder
+COPY --from=builder /app/src/generated ./src/generated
+
+# Copy built code from builder
+COPY --from=builder /app/dist ./dist
+
+# Create directory for saved images
+RUN mkdir -p ./src/user-content/images && \
+    chown -R node:node /app
+
+# Run as non-root user
+USER node
 
 ENV NODE_ENV=production
 
-CMD ["node", "src/index.mjs"]
+# Start the bot
+CMD ["node", "dist/index.js"]
