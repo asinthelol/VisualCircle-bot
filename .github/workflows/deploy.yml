@@ -56,7 +56,7 @@ jobs:
         aws ecr get-login-password --region ${{ secrets.AWS_REGION }} \
           | docker login --username AWS --password-stdin ${{ steps.ecr.outputs.registry }}
 
-        docker pull ${{ steps.ecr.outputs.registry }}/my-app:latest
+        docker pull ${{ steps.ecr.outputs.registry }}/visualcircle-bot:latest
 
         # run new container
         docker run -d --restart always --env-file .env --name visualcircle-bot ${{ steps.ecr.outputs.registry }}/visualcircle-bot:latest
