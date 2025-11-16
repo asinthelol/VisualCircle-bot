@@ -59,9 +59,6 @@ jobs:
         docker pull ${{ steps.ecr.outputs.registry }}/my-app:latest
 
         # run new container
-        docker run -d \
-          --name visualcircle-bot \
-          -p 80:80 \
-          ${{ steps.ecr.outputs.registry }}/visualcircle-bot:latest
+        docker run -d --restart always --env-file .env --name visualcircle-bot ${{ steps.ecr.outputs.registry }}/visualcircle-bot:latest
 
         EOF
