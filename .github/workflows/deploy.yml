@@ -1,0 +1,67 @@
+name: Deploy to EC2 with Docker
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # --- CHECKOUT CODE ---
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # --- CONFIGURE AWS ---
+    - name: Configure AWS
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    # --- LOGIN TO ECR ---
+    - name: Login to ECR
+      id: ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    # --- BUILD & PUSH DOCKER IMAGE ---
+    - name: Build, tag, and push image
+      env:
+        ECR_REGISTRY: ${{ steps.ecr.outputs.registry }}
+        ECR_REPOSITORY: VisualCircle-bot
+        IMAGE_TAG: latest
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+    # --- PREP SSH KEY ---
+    - name: Prepare SSH key
+      run: |
+        echo "${{ secrets.EC2_SSH_KEY }}" | base64 --decode > key.pem
+        chmod 600 key.pem
+
+    # --- DEPLOY ON EC2 ---
+    - name: Connect to EC2 and deploy
+      run: |
+        ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+
+        # stop old container
+        docker stop VisualCircle-bot || true
+        docker rm VisualCircle-bot || true
+
+        # pull latest image
+        aws ecr get-login-password --region ${{ secrets.AWS_REGION }} \
+          | docker login --username AWS --password-stdin ${{ steps.ecr.outputs.registry }}
+
+        docker pull ${{ steps.ecr.outputs.registry }}/my-app:latest
+
+        # run new container
+        docker run -d \
+          --name VisualCircle-bot \
+          -p 80:80 \
+          ${{ steps.ecr.outputs.registry }}/VisualCircle-bot:latest
+
+        EOF
